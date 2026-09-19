@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Jason Pro Audit Query Generator v2.3</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#f1f5f9;color:#1e293b;line-height:1.5;-webkit-text-size-adjust:100%}
+input,textarea,button{font-family:inherit;font-size:16px}
+.output-box{white-space:pre-wrap;line-height:1.8;word-break:break-word}
+
+/* ===== LOCK (iPhone safe) ===== */
+#lock{position:fixed;inset:0;background:#0f172a;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px}
+#lock.hide{display:none!important}
+#lockbox{background:#fff;border-radius:16px;padding:28px 22px;width:100%;max-width:300px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.35)}
+#lockbox h1{font-size:20px;font-weight:700;color:#0f172a;margin-bottom:2px}
+#lockbox .s{font-size:13px;color:#64748b}
+#lockbox .v{font-size:11px;color:#94a3b8;margin:8px 0 20px}
+#pwd{width:100%;padding:14px;border:2px solid #cbd5e1;border-radius:10px;text-align:center;font-size:22px;letter-spacing:6px;margin-bottom:12px;-webkit-appearance:none;appearance:none;background:#f8fafc}
+#pwd:focus{border-color:#2563eb;outline:none}
+#go{width:100%;padding:14px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-weight:600;font-size:16px}
+#err{color:#dc2626;font-size:13px;margin-top:12px;display:none}
+#lockfoot{font-size:10px;color:#94a3b8;margin-top:18px}
+
+#app{display:none}
+#app.show{display:block}
+
+.bar{background:#0f172a;color:#94a3b8;font-size:11px;padding:10px 12px;text-align:center}
+.bar button{background:#334155;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:12px;margin-left:8px}
+.wrap{max-width:680px;margin:0 auto;padding:16px 12px 48px}
+.head{text-align:center;margin-bottom:14px}
+.head h1{font-size:21px;font-weight:700}
+.head h1 span{color:#2563eb}
+.head p{font-size:12px;color:#64748b;margin-top:4px}
+.guide{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px;font-size:12px;color:#1e3a8a;margin-bottom:14px;line-height:1.65}
+.guide b{display:block;margin-bottom:6px}
+.guide ol{padding-left:18px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:14px}
+.ttl{font-size:14px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.num{display:inline-flex;width:20px;height:20px;border-radius:50%;background:#2563eb;color:#fff;font-size:11px;font-weight:700;align-items:center;justify-content:center;flex-shrink:0}
+.num.t{background:#0d9488}
+.desc{font-size:11px;color:#64748b;margin-bottom:10px;line-height:1.5}
+label{display:block;font-size:11px;font-weight:500;color:#475569;margin-bottom:4px}
+textarea,input[type=text]{width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;outline:none;background:#fff}
+textarea:focus,input[type=text]:focus{border-color:#2563eb}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.btn{border:none;border-radius:8px;padding:10px 14px;font-weight:500;cursor:pointer;color:#fff}
+/* Consistent colours */
+.b-blue{background:#2563eb}      /* primary / open outlook */
+.b-teal{background:#0d9488}      /* generate email */
+.b-teal2{background:#14b8a6}     /* update email */
+.b-dark{background:#334155}      /* download english word */
+.b-red{background:#dc2626}       /* chinese actions */
+.b-gray{background:#f1f5f9;color:#334155}
+.g2{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:520px){.g2{grid-template-columns:1fr 1fr}}
+.hid{display:none!important}
+.foot{border-top:1px solid #e2e8f0;background:#fff;padding:16px;text-align:center;font-size:10px;color:#64748b;line-height:1.6}
+</style>
+</head>
+<body>
+
+<!-- LOCK -->
+<div id="lock">
+  <div id="lockbox">
+    <h1>Jason Pro</h1>
+    <div class="s">Audit Query Generator</div>
+    <div class="v">v2.3 Grok · Enter password</div>
+    <input id="pwd" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="••••" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+    <button id="go" type="button">Unlock</button>
+    <div id="err">Incorrect password. Try 1005</div>
+    <div id="lockfoot">© 2025 Jason Chua · Authorised use only</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="bar">
+    © 2025 Jason Pro · v2.3 Grok · Founded by Jason Chua
+    <button id="btnLang" type="button">中文 / EN</button>
+  </div>
+
+  <div class="wrap">
+    <div class="head">
+      <h1>Jason Pro <span>Audit Query Generator</span></h1>
+      <p id="hdrSub">v2.3 Grok · Raw questions → AI Prompt → Audit Queries → Formal Email</p>
+    </div>
+
+    <div class="guide">
+      <b id="guideTitle">How to use</b>
+      <ol id="guideList">
+        <li>Type rough questions in Box 1 → Generate AI Prompt → paste into any AI.</li>
+        <li>Paste AI reply into Box 2 → download Word if needed.</li>
+        <li>Fill email fields → Generate Formal Email (pulls Box 2).</li>
+        <li>Edit body if needed → Update Email.</li>
+        <li>Chinese: Copy Translation Prompt → paste into AI → paste result → Copy Chinese Text / Download.</li>
+      </ol>
+    </div>
+
+    <!-- BOX 1 -->
+    <div class="card">
+      <div class="ttl"><span class="num">1</span><span id="box1Title">Raw Questions / Observations</span></div>
+      <p class="desc" id="box1Desc">Enter questions in plain language. Builds a detailed prompt for longer, well-spaced professional replies.</p>
+      <textarea id="rawInput" rows="4" placeholder="e.g. Why did revenue fall while cost of sales rose?"></textarea>
+      <div class="row">
+        <button id="btnGeneratePrompt" class="btn b-blue" type="button">Generate AI Prompt</button>
+        <button id="btnClear1" class="btn b-gray" type="button">Clear</button>
+      </div>
+      <div id="promptSection" class="hid" style="margin-top:12px">
+        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px">
+          <span id="promptLabel" style="font-size:11px;font-weight:600;color:#64748b">HIGH-PERFORMANCE PROMPT</span>
+          <div style="display:flex;gap:6px">
+            <button id="btnCopyPrompt" class="btn b-gray" type="button" style="padding:6px 10px;font-size:12px">Copy Prompt</button>
+            <button id="btnDownloadTxt" class="btn b-gray" type="button" style="padding:6px 10px;font-size:12px">Download .txt</button>
+          </div>
+        </div>
+        <div id="promptOutput" class="output-box" style="font-size:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;max-height:200px;overflow-y:auto"></div>
+      </div>
+    </div>
+
+    <!-- BOX 2 -->
+    <div class="card">
+      <div class="ttl"><span class="num">2</span><span id="box2Title">AI-Generated Audit Queries</span></div>
+      <p class="desc" id="box2Desc">Paste the full AI reply. Keep the blank lines between points — they will be preserved in Word and email.</p>
+      <textarea id="aiResults" rows="10" placeholder="Paste the complete list of audit queries from the AI here..." style="line-height:1.8"></textarea>
+      <div class="row">
+        <button id="btnDownloadWord" class="btn b-dark" type="button">Download as Word</button>
+        <button id="btnCopyResults" class="btn b-gray" type="button">Copy</button>
+        <button id="btnClear2" class="btn b-gray" type="button">Clear</button>
+      </div>
+    </div>
+
+    <!-- BOX 3 -->
+    <div class="card">
+      <div class="ttl"><span class="num t">3</span><span id="box3Title">Formal Email</span></div>
+      <p class="desc" id="box3Desc">Generate Formal Email inserts Box 2 content. After editing, click Update Email.</p>
+
+      <div class="g2" style="margin-bottom:12px">
+        <div><label id="lblRecipient">Recipient Name *</label><input id="recipientName" type="text" placeholder="e.g. Mr Tan"></div>
+        <div><label id="lblClient">Client / Company Name *</label><input id="clientName" type="text" placeholder="e.g. ABC Holdings Pte. Ltd."></div>
+        <div><label id="lblPeriod">Financial Year / Period</label><input id="fyPeriod" type="text" placeholder="e.g. year ended 31 Dec 2025"></div>
+        <div><label id="lblMyName">Your Name *</label><input id="myName" type="text" placeholder="e.g. Jason"></div>
+        <div><label id="lblDesignation">Your Designation (optional)</label><input id="myDesignation" type="text" placeholder="e.g. Audit Manager"></div>
+        <div><label id="lblFirm">Firm Name (optional)</label><input id="firmName" type="text" placeholder="e.g. XYZ LLP"></div>
+      </div>
+
+      <div style="margin-bottom:12px">
+        <label id="lblBody">Email body content (editable)</label>
+        <textarea id="emailBodyContent" rows="8" placeholder="Content from Box 2 is inserted when you click Generate Formal Email." style="line-height:1.8"></textarea>
+      </div>
+
+      <div class="row" style="margin-bottom:12px">
+        <button id="btnGenerateEmail" class="btn b-teal" type="button">Generate Formal Email</button>
+        <button id="btnUpdateEmail" class="btn b-teal2" type="button">Update Email</button>
+        <button id="btnClearGenerated" class="btn b-gray" type="button">Clear Generated Email</button>
+      </div>
+
+      <div id="emailOutputWrapper" class="hid" style="border-top:1px solid #e2e8f0;padding-top:14px">
+        <div style="margin-bottom:10px">
+          <label id="lblSubject">Subject Line</label>
+          <div id="emailSubject" style="font-size:13px;font-weight:500;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span id="lblEmailBody" style="font-size:11px;font-weight:600;color:#64748b">EMAIL BODY (ENGLISH)</span>
+          <button id="btnCopyEmail" class="btn b-gray" type="button" style="padding:5px 10px;font-size:12px">Copy Email</button>
+        </div>
+        <div id="emailOutput" class="output-box" style="font-size:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:12px"></div>
+
+        <div class="row" style="margin-bottom:14px">
+          <button id="btnOpenOutlook" class="btn b-blue" type="button">Open in Outlook</button>
+          <button id="btnDownloadEmailEN" class="btn b-dark" type="button">Download English (Word)</button>
+          <button id="btnCopyTranslatePrompt" class="btn b-red" type="button">Copy Chinese Translation Prompt</button>
+        </div>
+
+        <div style="border-top:1px solid #e2e8f0;padding-top:12px">
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px" id="cnTitle">Simplified Chinese Version</div>
+          <p class="desc" id="cnDesc">Click “Copy Chinese Translation Prompt”, paste into any AI, then paste the Chinese result below.</p>
+          <textarea id="cnEmailBody" rows="7" placeholder="Paste the full Simplified Chinese email from the AI here..." style="line-height:1.8"></textarea>
+          <div class="row" style="margin-top:10px">
+            <button id="btnCopyCN" class="btn b-blue" type="button">Copy Chinese Text</button>
+            <button id="btnOpenOutlookCN" class="btn b-blue" type="button">Open Outlook (then paste)</button>
+            <button id="btnDownloadEmailCN" class="btn b-red" type="button">Download Chinese (Word)</button>
+          </div>
+          <p id="cnHint" style="font-size:11px;color:#64748b;margin-top:8px">Tip: First click “Copy Chinese Text”, then “Open Outlook (then paste)”. Paste into the email body so Chinese displays correctly.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <p id="footer1">© 2025 Jason Pro Audit Query Generator – v2.3 Grok. Generated and founded by Jason Chua.</p>
+    <p id="footer2" style="margin-top:4px">This tool and its output are for authorised professional use only. Unauthorised reproduction or commercial use is prohibited.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+var LANG={
+en:{
+hdrSub:"v2.3 Grok · Raw questions → AI Prompt → Audit Queries → Formal Email",
+guideTitle:"How to use",
+guideList:["Type rough questions in Box 1 → Generate AI Prompt → paste into any AI.","Paste AI reply into Box 2 → download Word if needed.","Fill email fields → Generate Formal Email (pulls Box 2).","Edit body if needed → Update Email.","Chinese: Copy Translation Prompt → paste into AI → paste result → Copy Chinese Text / Download."],
+box1Title:"Raw Questions / Observations",box1Desc:"Enter questions in plain language. Builds a detailed prompt for longer, well-spaced professional replies.",
+rawPh:"e.g. Why did revenue fall while cost of sales rose?",
+btnGenPrompt:"Generate AI Prompt",btnClear:"Clear",promptLabel:"HIGH-PERFORMANCE PROMPT",btnCopyPrompt:"Copy Prompt",btnDlTxt:"Download .txt",
+box2Title:"AI-Generated Audit Queries",box2Desc:"Paste the full AI reply. Keep the blank lines between points — they will be preserved in Word and email.",
+aiPh:"Paste the complete list of audit queries from the AI here...",btnDlWord:"Download as Word",btnCopy:"Copy",
+box3Title:"Formal Email",box3Desc:"Generate Formal Email inserts Box 2 content. After editing, click Update Email.",
+lblRecipient:"Recipient Name *",lblClient:"Client / Company Name *",lblPeriod:"Financial Year / Period",lblMyName:"Your Name *",lblDesignation:"Your Designation (optional)",lblFirm:"Firm Name (optional)",
+phRecipient:"e.g. Mr Tan",phClient:"e.g. ABC Holdings Pte. Ltd.",phPeriod:"e.g. year ended 31 Dec 2025",phMyName:"e.g. Jason",phDesignation:"e.g. Audit Manager",phFirm:"e.g. XYZ LLP",
+lblBody:"Email body content (editable)",bodyPh:"Content from Box 2 is inserted when you click Generate Formal Email.",
+btnGenEmail:"Generate Formal Email",btnUpdateEmail:"Update Email",btnClearGen:"Clear Generated Email",
+lblSubject:"Subject Line",lblEmailBody:"EMAIL BODY (ENGLISH)",btnCopyEmail:"Copy Email",btnOpenOutlook:"Open in Outlook",btnDlEN:"Download English (Word)",btnCopyTrans:"Copy Chinese Translation Prompt",
+cnTitle:"Simplified Chinese Version",cnDesc:"Click “Copy Chinese Translation Prompt”, paste into any AI, then paste the Chinese result below.",
+cnPh:"Paste the full Simplified Chinese email from the AI here...",btnCopyCN:"Copy Chinese Text",btnOpenOutlookCN:"Open Outlook (then paste)",btnDlCN:"Download Chinese (Word)",
+cnHint:"Tip: First click “Copy Chinese Text”, then “Open Outlook (then paste)”. Paste into the email body so Chinese displays correctly.",
+footer1:"© 2025 Jason Pro Audit Query Generator – v2.3 Grok. Generated and founded by Jason Chua.",
+footer2:"This tool and its output are for authorised professional use only. Unauthorised reproduction or commercial use is prohibited.",
+a1:"Please enter your questions first.",a2:"Please paste the AI-generated queries first.",a3:"Please enter the Recipient Name.",a4:"Please enter the Client / Company Name.",a5:"Please enter Your Name.",a6:"No content available. Please paste queries into Box 2 first.",a7:"Please generate the formal email first.",a8:"Please paste the Chinese translation first."
+},
+zh:{
+hdrSub:"v2.3 Grok · 原始问题 → AI提示词 → 审计问询 → 正式邮件",
+guideTitle:"使用方法",
+guideList:["在第1栏输入原始问题 → 生成AI提示词 → 粘贴到任意AI。","将AI完整回复粘贴到第2栏 → 如需要可下载Word。","填写邮件信息 → 生成正式邮件（自动插入第2栏）。","如需修改正文，编辑后点击更新邮件。","中文：复制中文翻译提示词 → 粘贴到AI → 粘贴中文结果 → 复制中文文本 / 下载。"],
+box1Title:"原始问题 / 观察事项",box1Desc:"用普通语言输入问题。本工具会生成详细提示词，让AI输出更长、间距清晰的专业问询。",
+rawPh:"例如：为什么营业收入下降但营业成本上升？",
+btnGenPrompt:"生成AI提示词",btnClear:"清除",promptLabel:"高性能提示词",btnCopyPrompt:"复制提示词",btnDlTxt:"下载.txt",
+box2Title:"AI生成的审计问询",box2Desc:"粘贴AI的完整回复。请保留各点之间的空行，下载Word和生成邮件时会保留这些空行。",
+aiPh:"在此粘贴AI返回的完整审计问询列表...",btnDlWord:"下载为Word",btnCopy:"复制",
+box3Title:"正式邮件",box3Desc:"生成正式邮件会插入第2栏内容。编辑正文后点击更新邮件。",
+lblRecipient:"收件人姓名 *",lblClient:"客户 / 公司名称 *",lblPeriod:"财务年度 / 期间",lblMyName:"您的姓名 *",lblDesignation:"您的职位（可选）",lblFirm:"事务所名称（可选）",
+phRecipient:"例如：陈先生",phClient:"例如：ABC控股私人有限公司",phPeriod:"例如：截至2025年12月31日止年度",phMyName:"例如：Jason",phDesignation:"例如：审计经理",phFirm:"例如：XYZ事务所",
+lblBody:"邮件正文内容（可编辑）",bodyPh:"点击生成正式邮件时会自动插入第2栏内容。",
+btnGenEmail:"生成正式邮件",btnUpdateEmail:"更新邮件",btnClearGen:"清除已生成邮件",
+lblSubject:"邮件主题",lblEmailBody:"邮件正文（英文）",btnCopyEmail:"复制邮件",btnOpenOutlook:"在Outlook中打开",btnDlEN:"下载英文版（Word）",btnCopyTrans:"复制中文翻译提示词",
+cnTitle:"简体中文版本",cnDesc:"点击“复制中文翻译提示词”，粘贴到任意AI，然后将中文结果粘贴到下方。",
+cnPh:"在此粘贴AI返回的完整简体中文邮件...",btnCopyCN:"复制中文文本",btnOpenOutlookCN:"打开Outlook（然后粘贴）",btnDlCN:"下载中文版（Word）",
+cnHint:"提示：先点“复制中文文本”，再点“打开Outlook（然后粘贴）”。手动粘贴到邮件正文，中文才能正确显示。",
+footer1:"© 2025 Jason Pro 审计问询生成器 – v2.3 Grok。由 Jason Chua 创建并创办。",
+footer2:"本工具及其输出仅供授权用户专业使用。严禁未经授权的复制或商业用途。",
+a1:"请先输入您的问题。",a2:"请先粘贴AI生成的问询。",a3:"请输入收件人姓名。",a4:"请输入客户 / 公司名称。",a5:"请输入您的姓名。",a6:"没有可用内容。请先将问询粘贴到第2栏。",a7:"请先生成正式邮件。",a8:"请先粘贴中文翻译。"
+}
+};
+
+var currentLang="en";
+function T(){return LANG[currentLang];}
+function applyLang(lang){
+currentLang=lang;var t=LANG[lang];
+document.getElementById("hdrSub").textContent=t.hdrSub;
+document.getElementById("guideTitle").textContent=t.guideTitle;
+document.getElementById("guideList").innerHTML=t.guideList.map(function(x){return "<li>"+x+"</li>";}).join("");
+document.getElementById("box1Title").textContent=t.box1Title;
+document.getElementById("box1Desc").textContent=t.box1Desc;
+document.getElementById("rawInput").placeholder=t.rawPh;
+document.getElementById("btnGeneratePrompt").textContent=t.btnGenPrompt;
+document.getElementById("btnClear1").textContent=t.btnClear;
+document.getElementById("promptLabel").textContent=t.promptLabel;
+document.getElementById("btnCopyPrompt").textContent=t.btnCopyPrompt;
+document.getElementById("btnDownloadTxt").textContent=t.btnDlTxt;
+document.getElementById("box2Title").textContent=t.box2Title;
+document.getElementById("box2Desc").textContent=t.box2Desc;
+document.getElementById("aiResults").placeholder=t.aiPh;
+document.getElementById("btnDownloadWord").textContent=t.btnDlWord;
+document.getElementById("btnCopyResults").textContent=t.btnCopy;
+document.getElementById("btnClear2").textContent=t.btnClear;
+document.getElementById("box3Title").textContent=t.box3Title;
+document.getElementById("box3Desc").textContent=t.box3Desc;
+document.getElementById("lblRecipient").textContent=t.lblRecipient;
+document.getElementById("lblClient").textContent=t.lblClient;
+document.getElementById("lblPeriod").textContent=t.lblPeriod;
+document.getElementById("lblMyName").textContent=t.lblMyName;
+document.getElementById("lblDesignation").textContent=t.lblDesignation;
+document.getElementById("lblFirm").textContent=t.lblFirm;
+document.getElementById("recipientName").placeholder=t.phRecipient;
+document.getElementById("clientName").placeholder=t.phClient;
+document.getElementById("fyPeriod").placeholder=t.phPeriod;
+document.getElementById("myName").placeholder=t.phMyName;
+document.getElementById("myDesignation").placeholder=t.phDesignation;
+document.getElementById("firmName").placeholder=t.phFirm;
+document.getElementById("lblBody").textContent=t.lblBody;
+document.getElementById("emailBodyContent").placeholder=t.bodyPh;
+document.getElementById("btnGenerateEmail").textContent=t.btnGenEmail;
+document.getElementById("btnUpdateEmail").textContent=t.btnUpdateEmail;
+document.getElementById("btnClearGenerated").textContent=t.btnClearGen;
+document.getElementById("lblSubject").textContent=t.lblSubject;
+document.getElementById("lblEmailBody").textContent=t.lblEmailBody;
+document.getElementById("btnCopyEmail").textContent=t.btnCopyEmail;
+document.getElementById("btnOpenOutlook").textContent=t.btnOpenOutlook;
+document.getElementById("btnDownloadEmailEN").textContent=t.btnDlEN;
+document.getElementById("btnCopyTranslatePrompt").textContent=t.btnCopyTrans;
+document.getElementById("cnTitle").textContent=t.cnTitle;
+document.getElementById("cnDesc").textContent=t.cnDesc;
+document.getElementById("cnEmailBody").placeholder=t.cnPh;
+document.getElementById("btnCopyCN").textContent=t.btnCopyCN;
+document.getElementById("btnOpenOutlookCN").textContent=t.btnOpenOutlookCN;
+document.getElementById("btnDownloadEmailCN").textContent=t.btnDlCN;
+document.getElementById("cnHint").textContent=t.cnHint;
+document.getElementById("footer1").textContent=t.footer1;
+document.getElementById("footer2").textContent=t.footer2;
+}
+document.getElementById("btnLang").onclick=function(){applyLang(currentLang==="en"?"zh":"en");};
+
+/* ===== PASSWORD – maximum iPhone compatibility ===== */
+var PASS="1005";
+var lock=document.getElementById("lock");
+var app=document.getElementById("app");
+var pwd=document.getElementById("pwd");
+var go=document.getElementById("go");
+var err=document.getElementById("err");
+
+function unlock(){
+  var v=String(pwd.value||"").replace(/\D/g,"");
+  if(v===PASS){
+    lock.className="hide";
+    app.className="show";
+    pwd.value="";
+    err.style.display="none";
+  }else{
+    err.style.display="block";
+    pwd.value="";
+    setTimeout(function(){try{pwd.focus();}catch(e){}},100);
+  }
+}
+go.addEventListener("click",unlock);
+pwd.addEventListener("keydown",function(e){
+  if(e.key==="Enter"||e.keyCode===13){e.preventDefault();unlock();}
+});
+setTimeout(function(){try{pwd.focus();}catch(e){}},300);
+
+/* helpers */
+function flash(b){var o=b.textContent;b.textContent="✓";setTimeout(function(){b.textContent=o;},900);}
+function ds(){return new Date().toISOString().slice(0,10);}
+function dl(c,m,f){var b=new Blob([c],{type:m}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=f;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u);},2000);}
+function esc(s){return String(s).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,""");}
+function toHtml(t){
+  var n=t.replace(/\r\n/g,"\n").replace(/\r/g,"\n");
+  var blocks=n.split(/\n\s*\n/).map(function(b){return b.trim();}).filter(function(b){return b.length;});
+  return blocks.map(function(b){return '<p style="margin:0 0 16pt 0;line-height:1.7">'+esc(b).replace(/\n/g,"<br>")+"</p>";}).join("\n");
+}
+var foot='<div style="margin-top:24pt;font-size:8pt;color:#555;border-top:1px solid #ccc;padding-top:8pt;line-height:1.4">This document is confidential and intended solely for the use of the addressee and the engagement team. Any unauthorised review, use, disclosure or distribution is prohibited.<br>© Jason Pro Audit Query Generator – v2.3 Grok. Generated and founded by Jason Chua. All rights reserved.</div>';
+
+/* BOX 1 */
+var rawInput=document.getElementById("rawInput");
+var btnGeneratePrompt=document.getElementById("btnGeneratePrompt");
+var btnClear1=document.getElementById("btnClear1");
+var promptSection=document.getElementById("promptSection");
+var promptOutput=document.getElementById("promptOutput");
+var btnCopyPrompt=document.getElementById("btnCopyPrompt");
+var btnDownloadTxt=document.getElementById("btnDownloadTxt");
+var lastPrompt="";
+
+btnGeneratePrompt.onclick=function(){
+  var raw=rawInput.value.trim();
+  if(!raw){alert(T().a1);rawInput.focus();return;}
+  lastPrompt="You are a principal audit director with extensive experience in Singapore statutory audits under SFRS / SFRS(I), the Companies Act, ACRA and ISCA standards.\n\nConvert the raw questions below into a clear, professional list of formal audit queries.\n\n### Requirements (follow all strictly)\n1. Expand every point into complete, precise professional sentences.\n2. Where a prudent auditor would also ask about closely linked areas, include those points.\n3. Number main queries (1, 2, 3…). Use lettered sub-points (a, b, c…) when needed.\n4. CRITICAL SPACING RULE: Insert one blank line between each main numbered query AND between each lettered sub-point group. The final text must have clear visual separation and must never look crowded.\n5. Write in plain text only. Do not use asterisks (*), double asterisks (**), hash symbols (#) or any markdown.\n6. Do not omit any original point. Do not add a long introduction or closing.\n7. Output only the structured list of audit queries.\n\n### Raw questions from the engagement team:\n\n"+raw+"\n\nGenerate the professional audit query list now. Remember: one blank line between every main point and between sub-point groups.";
+  promptOutput.textContent=lastPrompt;
+  promptSection.classList.remove("hid");
+};
+btnClear1.onclick=function(){rawInput.value="";lastPrompt="";promptSection.classList.add("hid");};
+btnCopyPrompt.onclick=function(){if(!lastPrompt)return;navigator.clipboard.writeText(lastPrompt).then(function(){flash(btnCopyPrompt);});};
+btnDownloadTxt.onclick=function(){if(!lastPrompt)return;dl(lastPrompt,"text/plain;charset=utf-8","AI_Prompt_Audit_Queries_"+ds()+".txt");};
+
+/* BOX 2 */
+var aiResults=document.getElementById("aiResults");
+var btnDownloadWord=document.getElementById("btnDownloadWord");
+var btnCopyResults=document.getElementById("btnCopyResults");
+var btnClear2=document.getElementById("btnClear2");
+
+btnDownloadWord.onclick=function(){
+  var c=aiResults.value.trim();
+  if(!c){alert(T().a2);aiResults.focus();return;}
+  var html='<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>Audit Queries</title><style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#1a1a1a}h1{font-size:14pt;color:#1d4ed8;margin-bottom:4pt}.meta{font-size:9pt;color:#555;margin-bottom:14pt}</style></head><body><h1>Audit Queries</h1><div class="meta">Prepared using Jason Pro Audit Query Generator – v2.3 Grok</div>'+toHtml(c)+foot+"</body></html>";
+  dl("\ufeff"+html,"application/msword","Audit_Queries_"+ds()+".doc");
+};
+btnCopyResults.onclick=function(){var c=aiResults.value.trim();if(!c)return;navigator.clipboard.writeText(c).then(function(){flash(btnCopyResults);});};
+btnClear2.onclick=function(){aiResults.value="";};
+
+/* BOX 3 */
+var btnGenerateEmail=document.getElementById("btnGenerateEmail");
+var btnUpdateEmail=document.getElementById("btnUpdateEmail");
+var btnClearGenerated=document.getElementById("btnClearGenerated");
+var emailBodyContent=document.getElementById("emailBodyContent");
+var emailOutputWrapper=document.getElementById("emailOutputWrapper");
+var emailSubjectEl=document.getElementById("emailSubject");
+var emailOutput=document.getElementById("emailOutput");
+var btnCopyEmail=document.getElementById("btnCopyEmail");
+var btnOpenOutlook=document.getElementById("btnOpenOutlook");
+var btnDownloadEmailEN=document.getElementById("btnDownloadEmailEN");
+var btnCopyTranslatePrompt=document.getElementById("btnCopyTranslatePrompt");
+var cnEmailBody=document.getElementById("cnEmailBody");
+var btnCopyCN=document.getElementById("btnCopyCN");
+var btnOpenOutlookCN=document.getElementById("btnOpenOutlookCN");
+var btnDownloadEmailCN=document.getElementById("btnDownloadEmailCN");
+var lastEmailEN="",lastSubject="";
+
+function buildEmail(force){
+  var t=T();
+  var recipient=document.getElementById("recipientName").value.trim();
+  var client=document.getElementById("clientName").value.trim();
+  var period=document.getElementById("fyPeriod").value.trim()||(currentLang==="zh"?"本审计年度":"the financial year under audit");
+  var myName=document.getElementById("myName").value.trim();
+  var designation=document.getElementById("myDesignation").value.trim();
+  var firm=document.getElementById("firmName").value.trim();
+  if(force){var f=aiResults.value.trim();if(f)emailBodyContent.value=f;}
+  var queries=emailBodyContent.value.trim();
+  if(!recipient){alert(t.a3);document.getElementById("recipientName").focus();return;}
+  if(!client){alert(t.a4);document.getElementById("clientName").focus();return;}
+  if(!myName){alert(t.a5);document.getElementById("myName").focus();return;}
+  if(!queries){alert(t.a6);return;}
+  lastSubject=client+" – Audit for the "+period+" – Audit Queries";
+  var email="Dear "+recipient+",\n\nI hope you are well.\n\nWe are currently performing the statutory audit of "+client+" for "+period+". We would be grateful if you could assist us with the following matters:\n\n"+queries+"\n\nWe appreciate your assistance and look forward to your response at your earliest convenience. Please feel free to contact us if any clarification is required.\n\nThank you.\n\nBest regards,\n"+myName;
+  if(designation)email+="\n"+designation;
+  if(firm)email+="\n"+firm;
+  lastEmailEN=email;
+  emailSubjectEl.textContent=lastSubject;
+  emailOutput.textContent=email;
+  emailOutputWrapper.classList.remove("hid");
+}
+btnGenerateEmail.onclick=function(){buildEmail(true);};
+btnUpdateEmail.onclick=function(){buildEmail(false);};
+btnClearGenerated.onclick=function(){emailOutputWrapper.classList.add("hid");lastEmailEN="";lastSubject="";cnEmailBody.value="";};
+btnCopyEmail.onclick=function(){if(!lastEmailEN)return;navigator.clipboard.writeText(lastEmailEN).then(function(){flash(btnCopyEmail);});};
+btnOpenOutlook.onclick=function(){if(!lastEmailEN||!lastSubject){alert(T().a7);return;}window.location.href="mailto:?subject="+encodeURIComponent(lastSubject)+"&body="+encodeURIComponent(lastEmailEN);};
+btnDownloadEmailEN.onclick=function(){
+  if(!lastEmailEN){alert(T().a7);return;}
+  var html='<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>'+esc(lastSubject)+'</title><style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#1a1a1a}h1{font-size:13pt;color:#1d4ed8;margin-bottom:4pt}.meta{font-size:9pt;color:#555;margin-bottom:12pt}</style></head><body><h1>Audit Queries – Email</h1><div class="meta"><strong>Subject:</strong> '+esc(lastSubject)+"</div>"+toHtml(lastEmailEN)+foot+"</body></html>";
+  dl("\ufeff"+html,"application/msword","Audit_Email_EN_"+ds()+".doc");
+};
+btnCopyTranslatePrompt.onclick=function(){
+  if(!lastEmailEN){alert(T().a7);return;}
+  var p="You are a professional translator specialising in audit and accounting communications between English and Simplified Chinese (Mainland China usage).\n\nTranslate the following formal audit email into clear, natural and professional Simplified Chinese.\n\nRequirements:\n- Use terminology commonly understood by finance staff in Mainland China.\n- Keep the formal and polite tone.\n- Preserve the structure, numbering and blank-line spacing between points. Leave one blank line between each main point so the text is not crowded.\n- Translate accounting terms accurately (revenue → 营业收入, depreciation → 折旧, Property Plant and Equipment → 固定资产, BizFile → 企业信息公示报告, etc.).\n- Do not add or remove content.\n- Output only the fully translated email in Simplified Chinese.\n\nEnglish email to translate:\n\n"+lastEmailEN;
+  navigator.clipboard.writeText(p).then(function(){flash(btnCopyTranslatePrompt);});
+};
+btnCopyCN.onclick=function(){
+  var cn=cnEmailBody.value.trim();
+  if(!cn){alert(T().a8);cnEmailBody.focus();return;}
+  navigator.clipboard.writeText(cn).then(function(){flash(btnCopyCN);});
+};
+btnOpenOutlookCN.onclick=function(){
+  var cn=cnEmailBody.value.trim();
+  if(!cn){alert(T().a8);cnEmailBody.focus();return;}
+  navigator.clipboard.writeText(cn).then(function(){
+    flash(btnCopyCN);
+    var client=document.getElementById("clientName").value.trim()||"Client";
+    var period=document.getElementById("fyPeriod").value.trim()||"本审计年度";
+    var sub=client+" – "+period+"审计 – 审计问询";
+    setTimeout(function(){window.location.href="mailto:?subject="+encodeURIComponent(sub);},250);
+  });
+};
+btnDownloadEmailCN.onclick=function(){
+  var cn=cnEmailBody.value.trim();
+  if(!cn){alert(T().a8);cnEmailBody.focus();return;}
+  var client=document.getElementById("clientName").value.trim()||"Client";
+  var period=document.getElementById("fyPeriod").value.trim()||"本审计年度";
+  var sub=client+" – "+period+"审计 – 审计问询";
+  var html='<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>'+esc(sub)+'</title><style>body{font-family:"Microsoft YaHei","SimSun",Calibri,Arial,sans-serif;font-size:11pt;color:#1a1a1a}h1{font-size:13pt;color:#1d4ed8;margin-bottom:4pt}.meta{font-size:9pt;color:#555;margin-bottom:12pt}</style></head><body><h1>审计问询函</h1><div class="meta"><strong>主题：</strong> '+esc(sub)+"</div>"+toHtml(cn)+foot+"</body></html>";
+  dl("\ufeff"+html,"application/msword","Audit_Email_CN_"+ds()+".doc");
+};
+
+})();
+</script>
+</body>
+</html>
